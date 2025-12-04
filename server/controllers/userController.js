@@ -8,7 +8,7 @@ export async function createUserByAdmin(req, res) {
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     const { name, email, password, address, role } = req.body;
-    const [exists] = await db.promise().query('SELECT id FROM users WHERE email = ?', [email]);
+    const [exists] = await connectDB.promise().query('SELECT id FROM users WHERE email = ?', [email]);
     if (exists.length) return res.status(400).json({ error: 'Email exists' });
 
     const h = await bcrypt.hash(password, 10);
