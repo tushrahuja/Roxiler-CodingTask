@@ -49,14 +49,14 @@ export async function updatePassword(req, res) {
     const userId = req.user.id;
     const { oldPassword, newPassword } = req.body;
 
-    const [rows] = await db.promise().query('SELECT password_hash FROM users WHERE id = ?', [userId]);
+    const [rows] = await connectDB.promise().query('SELECT password_hash FROM users WHERE id = ?', [userId]);
     if (!rows.length) return res.status(404).json({ error: 'User not found' });
 
     const match = await bcrypt.compare(oldPassword, rows[0].password_hash);
     if (!match) return res.status(400).json({ error: 'Incorrect old password' });
 
     const h = await bcrypt.hash(newPassword, 10);
-    await db.promise().query('UPDATE users SET password_hash = ? WHERE id = ?', [h, userId]);
+    await connectDB.promise().query('UPDATE users SET password_hash = ? WHERE id = ?', [h, userId]);
     return res.json({ message: 'Password updated' });
   } catch (err) {
     console.error('updatePassword', err);
