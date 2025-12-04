@@ -29,8 +29,8 @@ export default function App() {
           <Route path="/owner/:ownerId" element={<OwnerDashboard />} />
         </Routes>
       </main>
-      <footer className="bg-white border-t">
-        <div className="container py-4 text-center text-sm text-slate-500">© {new Date().getFullYear()} RateWise</div>
+      <footer className="bg-[#2d2d2d] border-t border-[#3d3d3d]">
+        <div className="container py-4 text-center text-sm text-gray-400">© {new Date().getFullYear()} </div>
       </footer>
     </div>
   );
