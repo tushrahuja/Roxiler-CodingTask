@@ -22,7 +22,8 @@ app.get('/api/health', (req, res) => res.json({ ok: true, time: new Date().toISO
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-
+app.use('/api/stores', storeRoutes);
+app.use('/api/ratings', ratingRoutes);
 
 //for testing purposes only
 app.get('/api/test/protected', auth, (req, res) => {
