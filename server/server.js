@@ -1,7 +1,7 @@
-// server.js
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 dotenv.config();
 
 import authRoutes from './routes/authRoutes.js';
@@ -24,6 +24,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/ratings', ratingRoutes);
+
+const frontendDist = path.join(process.cwd(), 'frontend', 'dist');
+app.use(express.static(frontendDist));
+
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(frontendDist, 'index.html'));
+});
 
 //for testing purposes only
 app.get('/api/test/protected', auth, (req, res) => {
