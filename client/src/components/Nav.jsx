@@ -26,7 +26,7 @@ export default function Nav({ onLogout }) {
                 to="/admin" 
                 className="text-l font-medium text-gray-300 hover:text-white transition-colors relative group"
               >
-                Admin
+                Dashboard
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#d4d4a8] group-hover:w-full transition-all duration-300"></span>
               </Link>
             )}

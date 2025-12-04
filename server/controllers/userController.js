@@ -33,7 +33,7 @@ export async function listUsers(req, res) {
     const like = `%${q}%`;
 
     const sql = `SELECT id, name, email, address, role FROM users WHERE name LIKE ? OR email LIKE ? OR address LIKE ? ORDER BY ${sortExpr} ${order} LIMIT 1000;`;
-    const [rows] = await db.promise().query(sql, [like, like, like]);
+    const [rows] = await connectDB.promise().query(sql, [like, like, like]);
     return res.json({ users: rows });
   } catch (err) {
     console.error('listUsers', err);

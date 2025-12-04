@@ -6,7 +6,7 @@ import { addStoreByAdmin, listStores, ownerDashboard } from '../controllers/stor
 const router = express.Router();
 
 router.post('/', auth, permit('SYSTEM_ADMIN'), addStoreByAdmin);
-router.get('/', listStores);
+router.get('/', auth, listStores);
 router.get('/owner/:ownerId/dashboard', auth, permit('STORE_OWNER'), ownerDashboard);
 
 export default router;
