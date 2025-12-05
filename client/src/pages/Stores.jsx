@@ -18,6 +18,9 @@ export default function Stores() {
   const [message, setMessage] = useState('');
   const [toast, setToast] = useState(null);
   const [ratingModal, setRatingModal] = useState({ isOpen: false, storeId: null, storeName: '', currentRating: null });
+  const [page, setPage] = useState(1);
+  const [totalStores, setTotalStores] = useState(0);
+  const limit = 10;
 
   async function load() {
     setLoading(true);
@@ -29,8 +32,9 @@ export default function Stores() {
         setMessage('Please log in to view stores.');
         return;
       }
-      const res = await listStores({ q, sort, order, page:1, limit:50 });
+      const res = await listStores({ q, sort, order, page, limit });
       setStores(res.stores || []);
+      setTotalStores(res.total || 0);
     } catch (err) {
       // handle unauthorized specially
       if (err?.status === 401) {
@@ -48,7 +52,7 @@ export default function Stores() {
   useEffect(() => {
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]); // reload when token changes (login/logout)
+  }, [token, q, page]); // reload when token, search query, or page changes
 
   async function doRate(storeId, storeName, currentRating) {
     if (!token) {
@@ -82,6 +86,15 @@ export default function Stores() {
     }
   }
 
+  function handleSearchKeyPress(e) {
+    if (e.key === 'Enter') {
+      setPage(1);
+      load();
+    }
+  }
+
+  const totalPages = Math.ceil(totalStores / limit);
+
   return (
     <div className="py-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
@@ -90,8 +103,14 @@ export default function Stores() {
           <p className="text-gray-400">Browse stores and submit ratings (1–5)</p>
         </div>
         <div className="flex gap-2">
-          <input className="input md:w-64" placeholder="Search name or address" value={q} onChange={e=>setQ(e.target.value)} />
-          <button className="btn-primary md:w-auto px-6" onClick={load}>Search</button>
+          <input 
+            className="input md:w-64" 
+            placeholder="Search name or address" 
+            value={q} 
+            onChange={e=>{ setQ(e.target.value); setPage(1); }}
+            onKeyPress={handleSearchKeyPress}
+          />
+          <button className="btn-primary md:w-auto px-6" onClick={() => { setPage(1); load(); }}>Search</button>
         </div>
       </div>
 
@@ -161,6 +180,28 @@ export default function Stores() {
             </tbody>
           </table>
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#3d3d3d]">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-4 py-2 rounded-lg border border-[#4d4d4d] text-sm text-gray-300 hover:bg-[#3d3d3d] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-400">
+              Page {page} of {totalPages} ({totalStores} stores)
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-4 py-2 rounded-lg border border-[#4d4d4d] text-sm text-gray-300 hover:bg-[#3d3d3d] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       <RatingModal

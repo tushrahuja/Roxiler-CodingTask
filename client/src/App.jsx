@@ -30,7 +30,7 @@ export default function App() {
         </Routes>
       </main>
       <footer className="bg-[#2d2d2d] border-t border-[#3d3d3d]">
-        <div className="container py-4 text-center text-sm text-gray-400">© {new Date().getFullYear()} </div>
+        <div className="container py-4 text-center text-sm text-gray-400">© RateGenius {new Date().getFullYear()} </div>
       </footer>
     </div>
   );

@@ -70,21 +70,24 @@ export default function OwnerDashboard(){
                   <tr>
                     <th className="table-head">User</th>
                     <th className="table-head">Email</th>
-                    <th className="table-head">Store ID</th>
+                    <th className="table-head">Store</th>
                     <th className="table-head">Rating</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.ratings?.map((r, i) => (
-                    <tr key={i} className="border-t border-[#3d3d3d] hover:bg-[#252525] transition">
-                      <td className="table-cell">{r.name}</td>
-                      <td className="table-cell text-gray-400">{r.email}</td>
-                      <td className="table-cell text-gray-500">{r.store_id}</td>
-                      <td className="table-cell">
-                        <span className="text-[#d4d4a8] font-semibold text-lg">{r.rating}</span>
-                      </td>
-                    </tr>
-                  ))}
+                  {data.ratings?.map((r, i) => {
+                    const store = data.stores.find(s => s.id === r.store_id);
+                    return (
+                      <tr key={i} className="border-t border-[#3d3d3d] hover:bg-[#252525] transition">
+                        <td className="table-cell">{r.name}</td>
+                        <td className="table-cell text-gray-400">{r.email}</td>
+                        <td className="table-cell text-gray-300">{store?.name || `Store #${r.store_id}`}</td>
+                        <td className="table-cell">
+                          <span className="text-[#d4d4a8] font-semibold text-lg">{r.rating}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
