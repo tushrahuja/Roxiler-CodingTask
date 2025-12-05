@@ -26,10 +26,16 @@ export async function listStores(req, res) {
 
     const allowedSorts = { name: 's.name', address: 's.address', rating: 'avg_rating' };
     const sortExpr = allowedSorts[sortField] || 's.name';
+    const like = `%${q}%`;
+
+    const countSql = `SELECT COUNT(*) as total FROM stores s WHERE s.name LIKE ? OR s.address LIKE ?`;
+    const [countResult] = await connectDB.promise().query(countSql, [like, like]);
+    const total = countResult[0].total;
 
     const sql = `
       SELECT s.id, s.name, s.address, s.email,
         IFNULL(ROUND(AVG(r.rating),2),0) AS avg_rating,
+        COUNT(r.id) AS rating_count,
         (SELECT rating FROM ratings WHERE store_id = s.id AND user_id = ? LIMIT 1) AS user_rating
       FROM stores s
       LEFT JOIN ratings r ON r.store_id = s.id
@@ -38,9 +44,8 @@ export async function listStores(req, res) {
       ORDER BY ${sortExpr} ${order}
       LIMIT ? OFFSET ?;
     `;
-    const like = `%${q}%`;
     const [results] = await connectDB.promise().query(sql, [userId, like, like, limit, offset]);
-    return res.json({ stores: results });
+    return res.json({ stores: results, total, page, limit, totalPages: Math.ceil(total / limit) });
   } catch (err) {
     console.error('listStores', err);
     return res.status(500).json({ error: 'Server error' });
@@ -50,7 +55,6 @@ export async function listStores(req, res) {
 export async function ownerDashboard(req, res) {
   try {
     const ownerId = parseInt(req.params.ownerId);
-    // fetch stores for owner
     const sql = `
       SELECT s.id, s.name, s.address, IFNULL(ROUND(AVG(r.rating),2),0) AS avg_rating
       FROM stores s

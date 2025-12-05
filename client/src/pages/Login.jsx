@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { login as loginApi } from '../services/authService';
 import { useNavigate } from 'react-router-dom';

@@ -1,4 +1,3 @@
-// src/pages/Stores.jsx (updated dark theme version)
 import React, { useEffect, useState } from 'react';
 import { listStores } from '../services/storesService';
 import { submitRating } from '../services/ratingsService';
@@ -26,7 +25,6 @@ export default function Stores() {
     setLoading(true);
     setMessage('');
     try {
-      // If backend requires auth, ensure token exists before calling
       if (!token) {
         setStores([]);
         setMessage('Please log in to view stores.');
@@ -36,13 +34,11 @@ export default function Stores() {
       setStores(res.stores || []);
       setTotalStores(res.total || 0);
     } catch (err) {
-      // handle unauthorized specially
       if (err?.status === 401) {
         setMessage('Session expired or not authorized. Please log in.');
       } else {
         setMessage('Failed to load stores. Try again later.');
       }
-      // don't spam console in production; keep for dev troubleshooting:
       console.error('listStores err', err);
     } finally {
       setLoading(false);
@@ -51,8 +47,7 @@ export default function Stores() {
 
   useEffect(() => {
     load();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, q, page]); // reload when token, search query, or page changes
+  }, [token, q, page]);
 
   async function doRate(storeId, storeName, currentRating) {
     if (!token) {

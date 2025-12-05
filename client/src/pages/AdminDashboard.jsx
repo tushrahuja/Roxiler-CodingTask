@@ -1,4 +1,3 @@
-// src/pages/AdminDashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { adminListUsers, adminCreateUser } from '../services/usersService';
 import { adminListStores, createStore } from '../services/storesService';
@@ -30,8 +29,7 @@ export default function AdminDashboard(){
       setStores(s.stores || []);
       setTotalUsers(u.total || 0);
       setTotalStores(s.total || 0);
-      
-      // Calculate total ratings
+
       const totalRatingsCount = s.stores?.reduce((sum, store) => {
         return sum + (store.rating_count || 0);
       }, 0) || 0;

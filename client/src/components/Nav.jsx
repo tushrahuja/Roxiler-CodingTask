@@ -12,7 +12,6 @@ export default function Nav({ onLogout }) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
-  // Click outside to close menu
   useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {

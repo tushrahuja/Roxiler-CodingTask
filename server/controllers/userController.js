@@ -28,13 +28,40 @@ export async function listUsers(req, res) {
     const q = req.query.q || '';
     const sort = req.query.sort || 'name';
     const order = (req.query.order || 'asc').toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+    const page = parseInt(req.query.page || '1');
+    const limit = parseInt(req.query.limit || '10');
+    const offset = (page - 1) * limit;
     const allowedSort = { name: 'name', email: 'email', address: 'address', role: 'role' };
     const sortExpr = allowedSort[sort] || 'name';
     const like = `%${q}%`;
 
-    const sql = `SELECT id, name, email, address, role FROM users WHERE name LIKE ? OR email LIKE ? OR address LIKE ? ORDER BY ${sortExpr} ${order} LIMIT 1000;`;
-    const [rows] = await connectDB.promise().query(sql, [like, like, like]);
-    return res.json({ users: rows });
+    const countSql = `SELECT COUNT(*) as total FROM users WHERE name LIKE ? OR email LIKE ? OR address LIKE ? OR role LIKE ?`;
+    const [countResult] = await connectDB.promise().query(countSql, [like, like, like, like]);
+    const total = countResult[0].total;
+
+    const sql = `
+      SELECT 
+        u.id, 
+        u.name, 
+        u.email, 
+        u.address, 
+        u.role,
+        CASE 
+          WHEN u.role = 'STORE_OWNER' THEN (
+            SELECT ROUND(AVG(r.rating), 2)
+            FROM stores s
+            LEFT JOIN ratings r ON r.store_id = s.id
+            WHERE s.owner_id = u.id
+          )
+          ELSE NULL
+        END AS avg_rating
+      FROM users u
+      WHERE u.name LIKE ? OR u.email LIKE ? OR u.address LIKE ? OR u.role LIKE ?
+      ORDER BY ${sortExpr} ${order} 
+      LIMIT ? OFFSET ?;
+    `;
+    const [rows] = await connectDB.promise().query(sql, [like, like, like, like, limit, offset]);
+    return res.json({ users: rows, total, page, limit, totalPages: Math.ceil(total / limit) });
   } catch (err) {
     console.error('listUsers', err);
     return res.status(500).json({ error: 'Server error' });
