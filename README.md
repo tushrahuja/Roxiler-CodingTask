@@ -1,4 +1,4 @@
-# 🚀 RateGenius — Store Rating Platform
+# RateGenius: Store Rating Platform
 
 A full-stack web application built with **React + Vite + Tailwind CSS**, **Express.js**, and **MySQL**, allowing users to rate stores and providing dashboards for Admins, Store Owners, and Normal Users.
 
